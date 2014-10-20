@@ -1,0 +1,4 @@
+*.o
+start_mcast
+mcast
+

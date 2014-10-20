@@ -9,6 +9,7 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <time.h>
 
 #include <errno.h>
 
@@ -18,12 +19,18 @@
 
 #define MAX_MESS_LEN 1400
 
-#define PACKET_TYPE_START 1
-#define PACKET_TYPE_REGULAR 2
-#define PACKET_TYPE_PREP 0
-#define PACKET_TYPE_TOKEN 3
+#define WINDOW_SIZE 100
 
-#define PrepSizeWithNameLength(name) sizeof(packet) + sizeof(char) * (name + 1)
+#define PACKET_TYPE_START 83
+#define PACKET_TYPE_REGULAR 82
+#define PACKET_TYPE_PREP 80
+#define PACKET_TYPE_TOKEN 84
+
+#define TOKEN_RTR_TIMEOUT (0.1 / 1000)
+
+#define PrepSizeWithNameLength(name) sizeof(packet) + sizeof(bool) + sizeof(char) * (name + 1)
+#define TokenSizeWithNackCount(count) sizeof(packet) + sizeof(int) * 5 + sizeof(int) * count
+#define MessageSize sizeof(packet) + sizeof(int) * 2 + 1200
 
 typedef struct
 {
@@ -40,5 +47,31 @@ typedef struct
     char[] host_name;
   }
 }
+*/
 
+/* Token packet:
+{
+  char type;
+  int sender_id;
+  contents: {
+    int msg_seq;
+    int token_seq;
+    int aru;
+    int aru_id;
+    int nack_count;
+    int[] nacks;
+  }
+}
+*/
+
+/* Message packet:
+{
+  char type;
+  int sender_id;
+  contents: {
+    int msg_seq;
+    int random_number;
+    char[] payload;
+  }
+}
 */
